@@ -1,0 +1,21 @@
+{
+  "name": "geo-detectives-amg",
+  "version": "1.0.0",
+  "description": "Kit Didattico Gamification AMG Geo-Detectives - Web App con supporto Locale e Supabase Realtime per Vercel",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "start": "python3 -m http.server 3000",
+    "build": "echo 'Build statica completata per Vercel'"
+  },
+  "keywords": [
+    "didattica",
+    "gamification",
+    "geografia",
+    "supabase",
+    "vercel",
+    "scuola"
+  ],
+  "author": "AMG - Geo-Detectives",
+  "license": "MIT"
+}

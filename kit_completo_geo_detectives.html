@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kit Didattico Geo-Detectives | Sincronizzazione Bidirezionale TXT</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains+Mono', monospace;
+    }
+
+    .a4-sheet {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .badge-slot-size {
+      width: 78mm;
+      height: 46mm;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm 8mm 10mm;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box !important;
+      }
+      body {
+        background: white !important;
+        color: #0f172a !important;
+        font-size: 8.5pt !important;
+        line-height: 1.25 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .a4-sheet {
+        page-break-before: always !important;
+        page-break-after: always !important;
+        break-before: page !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        height: 280mm !important;
+        max-height: 280mm !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 6mm 6mm !important;
+        border: 1.5px solid #334155 !important;
+        background: white !important;
+      }
+      .a4-sheet:first-of-type {
+        page-break-before: auto !important;
+        break-before: auto !important;
+      }
+      .badge-stamp {
+        border: 2px dashed #1e293b !important;
+        background: #fafafa !important;
+      }
+      input, select {
+        border: none !important;
+        background: transparent !important;
+        appearance: none !important;
+      }
+    }
+    @media screen {
+      .print-only {
+        display: none;
+      }
+      .a4-sheet {
+        margin-bottom: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-900 antialiased min-h-screen">
+
+  <!-- ========================================== -->
+  <!-- BARRA DI CONTROLLO INTERFACCIA WEB / LIM   -->
+  <!-- ========================================== -->
+  <header class="no-print bg-slate-900 text-white sticky top-0 z-50 shadow-xl border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl p-1 bg-blue-600/30 rounded-lg border border-blue-500/40">🌍</span>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-black tracking-tight uppercase">AMG: Geo-Detectives</h1>
+            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/40 font-mono">SYNC TXT BIDIREZIONALE ATTIVA</span>
+          </div>
+          <p class="text-xs text-slate-400">Modifica i dati su LIM o Passaporti ed esporta il file TXT aggiornato</p>
+        </div>
+      </div>
+
+      <!-- Menu Navigazione Sezioni -->
+      <nav class="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm">
+        <button onclick="filterView('all')" id="btn-all" class="nav-btn px-2.5 py-1.5 rounded-lg bg-blue-600 text-white font-semibold transition hover:bg-blue-500">📖 Tutto</button>
+        <button onclick="filterView('lim-hub')" id="btn-lim-hub" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">🖥️ Hub LIM</button>
+        <button onclick="filterView('dashboard-sec')" id="btn-dashboard-sec" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition text-amber-300 font-bold">5.4 Tabellone Editabile</button>
+        <button onclick="filterView('passaporto')" id="btn-passaporto" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">5.1 Passaporto</button>
+        <button onclick="filterView('sfide')" id="btn-sfide" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">5.2 Dossier 1-2-3</button>
+        <button onclick="filterView('badge-sec')" id="btn-badge-sec" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">5.3 Badge</button>
+        <button onclick="filterView('docente-sec')" id="btn-docente-sec" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">5.5 Guida Docente</button>
+        <button onclick="filterView('carte-sec')" id="btn-carte-sec" class="nav-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 font-medium transition">5.6 Carte Aiuto</button>
+      </nav>
+
+      <!-- Pulsanti Azione e Gestione Dati TXT -->
+      <div class="flex items-center gap-2">
+        <button onclick="openSyncModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Importa TXT
+        </button>
+        <button onclick="exportUpdatedTxt()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          Salva TXT
+        </button>
+        <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Stampa A4
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra di Notifica Sincronizzazione Dati -->
+    <div class="bg-slate-800 border-t border-slate-700 px-4 py-1 text-xs text-slate-300 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Stato Database: <strong class="text-emerald-300 font-mono" id="sync-source-label">registro_gamification_geo_detectives.txt (Sincronizzato)</strong></span>
+        <span class="text-slate-500">•</span>
+        <span id="sync-stats-label">6 Squadre | 24 Alunni | Modalità Modifica Attiva</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-[11px] text-slate-300 font-medium">Visualizza Passaporto 5.1 per:</label>
+        <select id="team-selector-quick" onchange="autoFillPassport(this.value)" class="bg-slate-950 border border-slate-600 rounded px-2.5 py-0.5 text-xs text-amber-300 font-bold focus:outline-none focus:border-amber-400">
+          <option value="1">Squadra Alpha</option>
+          <option value="2">Squadra Beta</option>
+          <option value="3">Squadra Gamma</option>
+          <option value="4" selected>Squadra Delta (BES)</option>
+          <option value="5">Squadra Epsilon</option>
+          <option value="6">Squadra Zeta</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- MODALE PER CARICARE / INCOLLARE IL FILE TXT -->
+  <div id="sync-modal" class="no-print fixed inset-0 z-50 bg-black/75 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-3xl w-full shadow-2xl space-y-4 border border-slate-300">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🔄</span>
+          <div>
+            <h3 class="text-lg font-black text-slate-900">Sincronizzazione Dati con File TXT</h3>
+            <p class="text-xs text-slate-500">Importa o incolla il file <code class="font-mono text-blue-700">registro_gamification_geo_detectives.txt</code></p>
+          </div>
+        </div>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-slate-700 font-bold text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-700">Seleziona File da PC:</label>
+          <input type="file" id="txt-file-input" accept=".txt,.csv" onchange="handleFileSelect(event)" class="text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-800 hover:file:bg-blue-200 cursor-pointer">
+        </div>
+        <button onclick="loadDefaultData()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-3 py-1.5 rounded-lg border transition">
+          Carica Dati di Default
+        </button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Editor / Testo Sorgente del Registro:</label>
+        <textarea id="txt-source-textarea" class="w-full h-56 text-[11px] font-mono p-3 border border-slate-300 rounded-lg bg-slate-50 focus:bg-white focus:outline-blue-600 focus:ring-1 focus:ring-blue-600 leading-relaxed" placeholder="Incolla qui il contenuto del file txt..."></textarea>
+      </div>
+
+      <div class="flex justify-between items-center pt-2 border-t">
+        <span class="text-[11px] text-slate-500">Formato compatibile: sezioni analitiche o CSV strutturato.</span>
+        <div class="flex gap-2">
+          <button onclick="closeSyncModal()" class="text-xs px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 font-semibold text-slate-700">Annulla</button>
+          <button onclick="applyPastedTxt()" class="text-xs px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 font-bold text-white shadow">Applica Modifiche al Kit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SEZIONE LIM HUB: PROIEZIONE IN CLASSE     -->
+  <!-- ========================================== -->
+  <main id="lim-hub" class="content-sec max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+    <div class="no-print bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-indigo-700/40 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-400/30 uppercase tracking-wider">
+          <span>📡 Quadro Missioni D'Aula</span> • <span>Classe 3ª A — Geografia</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-white">Agenzia Mondiale Geografia (AMG)</h2>
+        <p class="text-blue-200 text-sm max-w-2xl leading-relaxed">
+          I dati proiettati sono sincronizzati con <code class="font-mono bg-blue-900/60 px-1 py-0.5 rounded text-amber-300 font-bold">registro_gamification_geo_detectives.txt</code>. Modificando i punteggi nella tabella sottostante o nei passaporti, i totali e i badge si ricalcolano all'istante e possono essere riesportati.
+        </p>
+      </div>
+      
+      <!-- Timer Digitale Interattivo LIM -->
+      <div class="bg-slate-950/80 border-2 border-amber-500/40 rounded-xl p-5 flex flex-col items-center w-full lg:w-auto min-w-[260px] shadow-inner">
+        <span class="text-[11px] font-bold text-amber-300/80 uppercase tracking-widest flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Timer Ufficiale Dossier
+        </span>
+        <div id="lim-timer" class="text-5xl font-mono font-black text-amber-400 my-2 tracking-wider drop-shadow-[0_0_10px_rgba(251,191,36,0.3)]">20:00</div>
+        <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+          <button onclick="startTimer(20)" class="bg-blue-600 hover:bg-blue-500 text-xs px-2.5 py-1 rounded-md text-white font-semibold shadow">20m</button>
+          <button onclick="startTimer(15)" class="bg-blue-600 hover:bg-blue-500 text-xs px-2.5 py-1 rounded-md text-white font-semibold shadow">15m</button>
+          <button onclick="pauseTimer()" class="bg-amber-600 hover:bg-amber-500 text-xs px-2.5 py-1 rounded-md text-white font-semibold shadow">Pausa</button>
+          <button onclick="resetTimer()" class="bg-slate-700 hover:bg-slate-600 text-xs px-2.5 py-1 rounded-md text-white font-semibold shadow">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOX SCENARIO AMG PER PROIEZIONE SULLA LIM -->
+    <div class="no-print bg-slate-900 border-2 border-amber-500/60 rounded-2xl p-6 text-white shadow-lg">
+      <div class="flex items-center gap-3 border-b border-slate-700 pb-3 mb-3">
+        <span class="text-2xl animate-pulse">📡</span>
+        <div>
+          <span class="bg-amber-500 text-slate-950 font-black text-[10px] px-2 py-0.5 rounded tracking-widest font-mono">COMUNICAZIONE UFFICIALE LIM • INCONTRO 1</span>
+          <h3 class="text-lg font-black text-amber-400 tracking-wide mt-0.5">SCENARIO AMG: IL PIANETA VIVENTE IN PERICOLO</h3>
+        </div>
+      </div>
+      <p class="text-slate-200 text-sm leading-relaxed italic bg-slate-950/60 p-4 rounded-xl border border-slate-800">
+        «ATTENZIONE A TUTTE LE UNITÀ INVESTIGATIVE! Un’organizzazione sconosciuta sta tentando di manomettere i dati fisici e cartografici del nostro pianeta. Dalle nostre stazioni risultano orari di volo completamente sballati, mappe delle placche deformate e segnali di soccorso non decifrati provenienti dalle ultime foreste pluviali. Se non ripristiniamo le informazioni corrette, l'equilibrio della Terra andrà in tilt. Da questo momento la classe è nominata <strong class="text-amber-400">Unità Speciale Geo-Detectives</strong>. Aprite le buste del <strong class="text-blue-400">DOSSIER 1</strong>: avete 20 minuti per il primo caso!»
+      </p>
+    </div>
+
+    <!-- Indicatori Statistici Sintetici estratti dal TXT -->
+    <div class="no-print grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[10px] uppercase font-bold text-slate-500">Squadre Registrate</span>
+        <div id="stat-teams-count" class="text-2xl font-black text-blue-900 mt-0.5">6</div>
+      </div>
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[10px] uppercase font-bold text-slate-500">Badge Assegnati Totali</span>
+        <div id="stat-badges-count" class="text-2xl font-black text-amber-600 mt-0.5">18 / 18</div>
+      </div>
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[10px] uppercase font-bold text-slate-500">Punti Complessivi Classe</span>
+        <div id="stat-points-count" class="text-2xl font-black text-emerald-600 mt-0.5">1450 pt</div>
+      </div>
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[10px] uppercase font-bold text-slate-500">Stato Missione Globale</span>
+        <div id="stat-global-status" class="text-sm font-black text-purple-700 mt-2 uppercase">100% QUALIFICATO</div>
+      </div>
+    </div>
+  </main>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-10 pb-16">
+
+    <!-- ======================================================== -->
+    <!-- 5.4. TABELLONE DI MONITORAGGIO EDITABILE BIDIREZIONALE   -->
+    <!-- ======================================================== -->
+    <section id="dashboard-sec" class="content-sec a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+      <div>
+        <div class="bg-slate-50 border border-slate-300 rounded p-1.5 text-[10px] text-slate-600 mb-2 flex justify-between items-center">
+          <div><strong>DOC. 5.4:</strong> Tabellone di Monitoraggio e Sincronizzazione AMG</div>
+          <div class="font-mono text-emerald-700 font-bold flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Bidirezionale: Editabile a schermo & Esportabile in TXT
+          </div>
+          <div><strong>USO:</strong> LIM / Bacheca di Classe</div>
+        </div>
+
+        <div class="border-b-2 border-cyan-600 pb-1.5 mb-2.5 flex flex-wrap justify-between items-center gap-2">
+          <div>
+            <span class="bg-cyan-100 text-cyan-900 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOCUMENTO UFFICIALE 5.4 • INTERATTIVO</span>
+            <h2 class="text-lg font-black text-slate-900 leading-tight">TABELLONE DI MONITORAGGIO MISSIONI AMG</h2>
+            <p class="text-[11px] text-slate-600">Fai clic sui punteggi per modificarli o clicca sui badge per alternare lo stato (🏅 / ✕). Totale e qualifica si aggiornano automaticamente.</p>
+          </div>
+          <div class="flex items-center gap-2 no-print">
+            <button onclick="exportUpdatedTxt()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg shadow flex items-center gap-1 transition">
+              <span>💾</span> Salva Modifiche nel TXT
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabella con Input Diretti per Sincronizzazione -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse border border-slate-300 rounded">
+            <thead class="bg-slate-900 text-white text-[10px]">
+              <tr>
+                <th class="p-1.5 border border-slate-700 w-36">Squadra</th>
+                <th class="p-1.5 border border-slate-700">Membri e Ruoli Operativi</th>
+                <th class="p-1.5 border border-slate-700 text-center w-24">Dossier 1 (Fusi)</th>
+                <th class="p-1.5 border border-slate-700 text-center w-24">Dossier 2 (Placche)</th>
+                <th class="p-1.5 border border-slate-700 text-center w-24">Dossier 3 (Biomi)</th>
+                <th class="p-1.5 border border-slate-700 text-center w-16">Punti Tot</th>
+                <th class="p-1.5 border border-slate-700 text-center w-20">Badge</th>
+                <th class="p-1.5 border border-slate-700 text-center w-28">Stato Finale</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-body" class="divide-y divide-slate-200 text-[10.5px]">
+              <!-- Righe popolate dinamicamente da JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-2 text-[10px] text-slate-500 bg-slate-50 p-2 rounded border flex flex-wrap justify-between items-center gap-2">
+        <span>💡 <strong>Istruzioni operative:</strong> I punti inseriti modificano istantaneamente il Passaporto 5.1 e il database in memoria. Clicca su <strong>"Salva TXT"</strong> per scaricare la versione aggiornata.</span>
+        <span class="font-mono text-slate-700 font-bold">registro_gamification_geo_detectives.txt</span>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 5.1. PASSAPORTO INVESTIGATIVO SINCRONIZZATO (A4)         -->
+    <!-- ======================================================== -->
+    <section id="passaporto" class="content-sec a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+      <div>
+        <div class="bg-slate-50 border border-slate-300 rounded p-1.5 text-[10px] text-slate-600 mb-2 flex justify-between items-center">
+          <div><strong>DOC. 5.1:</strong> Passaporto Investigativo Ufficiale di Squadra</div>
+          <div class="text-blue-800 font-bold font-mono">Dati sincronizzati con il registro TXT</div>
+          <div><strong>USO:</strong> Incontro 1 (avvio indagini)</div>
+        </div>
+
+        <div class="border-b-2 border-blue-600 pb-1.5 mb-2.5 flex justify-between items-center">
+          <div>
+            <span class="bg-blue-100 text-blue-900 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">AMG • PASSAPORTO SQUADRA</span>
+            <h2 class="text-xl font-black text-slate-900 leading-tight">PASSAPORTO INVESTIGATIVO GEO-DETECTIVES</h2>
+            <p class="text-[11px] text-slate-600">Unità 1: <em>Il Pianeta Vivente</em> • Disciplina: Geografia • Classe 3ª A</p>
+          </div>
+          <div class="w-12 h-12 shrink-0 hidden sm:block">
+            <svg viewBox="0 0 100 100" class="w-full h-full text-blue-700" fill="currentColor">
+              <circle cx="50" cy="50" r="46" fill="#eff6ff" stroke="currentColor" stroke-width="4"/>
+              <circle cx="50" cy="50" r="28" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="4 2"/>
+              <path d="M30 45 C35 38 42 42 45 40 C52 35 60 38 68 45 C65 55 58 55 52 62 C45 68 38 65 30 58 Z" fill="#93c5fd"/>
+              <text x="50" y="78" font-size="8" font-weight="bold" text-anchor="middle" fill="#1e3a8a">AMG INVESTIGAZIONI</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Dati Squadra & Ruoli Dinamici ed Editabili -->
+        <div class="border border-slate-700 rounded-lg p-2.5 mb-2.5 bg-slate-50/50">
+          <div class="grid grid-cols-2 gap-3 text-xs mb-2">
+            <div>
+              <span class="font-bold text-slate-700 uppercase text-[10px]">Nome Squadra:</span>
+              <div id="pass-team-name" class="border-b border-slate-500 py-0.5 font-black text-blue-900 text-sm">Squadra Delta</div>
+            </div>
+            <div>
+              <span class="font-bold text-slate-700 uppercase text-[10px]">Classe, Sezione & Stato:</span>
+              <div id="pass-team-meta" class="border-b border-slate-500 py-0.5 font-semibold text-slate-900">Classe 3ª A • Stato: QUALIFICATO_STANDARD</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="p-1.5 bg-white border border-slate-300 rounded">
+              <span class="font-bold text-blue-900">1. Capo Investigatore (Dati & Calcoli):</span>
+              <div id="pass-role-1" class="border-b border-dashed border-slate-400 py-0.5 font-medium text-slate-900">Alessio De Luca</div>
+            </div>
+            <div class="p-1.5 bg-white border border-slate-300 rounded">
+              <span class="font-bold text-emerald-900">2. Cartografo (Mappe & Schemi):</span>
+              <div id="pass-role-2" class="border-b border-dashed border-slate-400 py-0.5 font-medium text-slate-900">Lorenzo Gallo [Studente BES - Cartografo Operativo]</div>
+            </div>
+            <div class="p-1.5 bg-white border border-slate-300 rounded">
+              <span class="font-bold text-amber-900">3. Custode del Tempo (Timer LIM):</span>
+              <div id="pass-role-3" class="border-b border-dashed border-slate-400 py-0.5 font-medium text-slate-900">Martina Costa</div>
+            </div>
+            <div class="p-1.5 bg-white border border-slate-300 rounded">
+              <span class="font-bold text-purple-900">4. Portavoce (Relazione con Docente):</span>
+              <div id="pass-role-4" class="border-b border-dashed border-slate-400 py-0.5 font-medium text-slate-900">Gabriele Fontana</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REGISTRO BADGE CON SLOT ESATTI 78mm x 46mm -->
+        <div class="border border-slate-700 rounded-lg p-2 bg-white">
+          <div class="flex justify-between items-center border-b pb-1 mb-2">
+            <h3 class="font-black text-slate-900 text-xs uppercase tracking-wide">Registro di Conquista dei 3 Badge Ufficiali</h3>
+            <span class="text-[10px] text-slate-500 font-mono">Soglia minima di sblocco: 70/100 pt</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center">
+            
+            <!-- Badge 1 Slot -->
+            <div class="p-1.5 bg-slate-50 border border-slate-300 rounded flex flex-col justify-between items-center">
+              <div class="text-[10px] font-bold text-blue-900">DOSSIER 1: TEMPO & ASTRO</div>
+              <div class="badge-slot-size border-2 border-dashed border-blue-400 rounded bg-white flex flex-col justify-center items-center p-1 text-slate-400 font-mono text-[9px] my-1">
+                <span class="text-emerald-700 font-bold text-xs" id="pass-badge-1-status">✓ BADGE SBLOCCATO</span>
+                <span class="font-bold text-blue-800 text-[10px] mt-0.5">MASTER DEL TEMPO</span>
+                <span>Dimensione: 78 × 46 mm</span>
+              </div>
+              <div class="text-[10px] text-slate-600 w-full flex justify-between px-1">
+                <span id="pass-punti-1" class="font-bold">Pt: 75/100</span>
+                <span>Firma: Prof. Docente</span>
+              </div>
+            </div>
+
+            <!-- Badge 2 Slot -->
+            <div class="p-1.5 bg-slate-50 border border-slate-300 rounded flex flex-col justify-between items-center">
+              <div class="text-[10px] font-bold text-emerald-900">DOSSIER 2: TETTONICA & CLIMI</div>
+              <div class="badge-slot-size border-2 border-dashed border-emerald-400 rounded bg-white flex flex-col justify-center items-center p-1 text-slate-400 font-mono text-[9px] my-1">
+                <span class="text-emerald-700 font-bold text-xs" id="pass-badge-2-status">✓ BADGE SBLOCCATO</span>
+                <span class="font-bold text-emerald-800 text-[10px] mt-0.5">SISMOLOGO PIANETA</span>
+                <span>Dimensione: 78 × 46 mm</span>
+              </div>
+              <div class="text-[10px] text-slate-600 w-full flex justify-between px-1">
+                <span id="pass-punti-2" class="font-bold">Pt: 75/100</span>
+                <span>Firma: Prof. Docente</span>
+              </div>
+            </div>
+
+            <!-- Badge 3 Slot -->
+            <div class="p-1.5 bg-slate-50 border border-slate-300 rounded flex flex-col justify-between items-center">
+              <div class="text-[10px] font-bold text-amber-900">DOSSIER 3: BIOSFERA & SOS</div>
+              <div class="badge-slot-size border-2 border-dashed border-amber-400 rounded bg-white flex flex-col justify-center items-center p-1 text-slate-400 font-mono text-[9px] my-1">
+                <span class="text-emerald-700 font-bold text-xs" id="pass-badge-3-status">✓ BADGE SBLOCCATO</span>
+                <span class="font-bold text-amber-800 text-[10px] mt-0.5">CUSTODE BIOSFERA</span>
+                <span>Dimensione: 78 × 46 mm</span>
+              </div>
+              <div class="text-[10px] text-slate-600 w-full flex justify-between px-1">
+                <span id="pass-punti-3" class="font-bold">Pt: 70/100</span>
+                <span>Firma: Prof. Docente</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificazione Finale sincronizzata -->
+      <div class="mt-2 pt-2 border-t border-slate-300 flex justify-between items-center text-[10px]">
+        <div class="font-bold text-slate-800">
+          Totale Punti Registrati: <span id="pass-punti-tot" class="text-blue-900 font-black text-xs">220 / 300 pt</span> &nbsp;—&nbsp; Esito: <span id="pass-esito-box" class="bg-emerald-100 text-emerald-900 font-mono font-bold px-2 py-0.5 rounded">QUALIFICATO_STANDARD</span>
+        </div>
+        <div class="font-mono text-slate-500">Privilegio: <span id="pass-privilegio" class="text-slate-800 font-bold">Supporto visivo permanente</span></div>
+      </div>
+    </section>
+
+    <!-- DOSSIER 1, 2, 3 (SEZIONI OPERATIVE A4) -->
+    <div id="sfide" class="content-sec space-y-10">
+      
+      <!-- DOSSIER 1 -->
+      <div id="dossier-1" class="a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+        <div>
+          <div class="bg-slate-50 border border-slate-300 rounded p-1 text-[10px] text-slate-600 mb-1.5 flex justify-between items-center">
+            <div><strong>DOSSIER 1:</strong> L'Anomalia Temporale e Astronomica</div>
+            <div><strong>DESTINATARIO:</strong> Squadre di studenti</div>
+            <div><strong>TEMPO:</strong> Incontro 1 (40 min indagine)</div>
+          </div>
+
+          <div class="border-b-2 border-blue-600 pb-1 mb-2 flex justify-between items-center">
+            <div>
+              <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOSSIER 1 • LIVELLO 1</span>
+              <h2 class="text-base font-black text-slate-900 leading-tight">L'Anomalia Temporale e Astronomica</h2>
+            </div>
+            <span class="text-[10px] bg-slate-100 font-mono font-bold px-2 py-0.5 rounded border">Max 100 pt • Min sblocco: 70 pt</span>
+          </div>
+
+          <!-- Sfida 1.1 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 mb-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-blue-600">SFIDA 1.1</span> — Il Volo Intercontinentale dell'Agente X
+              </h3>
+              <span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">50 Punti • 20 min</span>
+            </div>
+
+            <!-- Schema Grafico Fusi -->
+            <div class="my-1 p-1.5 bg-slate-50 rounded border border-slate-200">
+              <svg viewBox="0 0 700 130" class="w-full h-auto max-h-24 bg-white rounded border border-slate-300">
+                <rect x="0" y="0" width="700" height="130" fill="#f8fafc"/>
+                <line x1="280" y1="15" x2="280" y2="115" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+                <text x="280" y="12" font-size="8" font-weight="bold" fill="#dc2626" text-anchor="middle">Meridiano 0° (Greenwich)</text>
+                
+                <line x1="315" y1="15" x2="315" y2="110" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="420" y1="15" x2="420" y2="110" stroke="#cbd5e1" stroke-width="1"/>
+                <line x1="630" y1="15" x2="630" y2="110" stroke="#64748b" stroke-width="1.5"/>
+                <text x="630" y="12" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">Linea Cambio Data (+12/-12)</text>
+
+                <!-- Città -->
+                <circle cx="315" cy="55" r="4" fill="#2563eb"/>
+                <text x="315" y="45" font-size="9" font-weight="bold" fill="#1e3a8a" text-anchor="middle">MILANO (+1)</text>
+                
+                <circle cx="420" cy="65" r="4" fill="#d97706"/>
+                <text x="420" y="55" font-size="9" font-weight="bold" fill="#92400e" text-anchor="middle">DUBAI (+4)</text>
+
+                <circle cx="630" cy="85" r="4" fill="#059669"/>
+                <text x="630" y="75" font-size="9" font-weight="bold" fill="#065f46" text-anchor="middle">SYDNEY (+10)</text>
+
+                <path d="M 315 55 Q 365 35 420 65" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="3 2"/>
+                <path d="M 420 65 Q 520 45 630 85" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="3 2"/>
+
+                <text x="280" y="124" font-size="8" fill="#dc2626" font-weight="bold" text-anchor="middle">0h</text>
+                <text x="315" y="124" font-size="8" fill="#2563eb" font-weight="bold" text-anchor="middle">+1h</text>
+                <text x="420" y="124" font-size="8" fill="#d97706" font-weight="bold" text-anchor="middle">+4h</text>
+                <text x="630" y="124" font-size="8" fill="#059669" font-weight="bold" text-anchor="middle">+10h</text>
+              </svg>
+            </div>
+
+            <div class="text-[11px] bg-slate-50 p-2 rounded text-slate-700 leading-tight mb-2">
+              <strong>Dati AMG:</strong> Decollo da <strong>Milano (UTC+1)</strong> il <strong>22 dicembre alle 11:50</strong>. Volo 1 per Dubai dura <strong>4h 40m</strong> (+3 ore da Milano). Ripartenza da Dubai alle <strong>21:30</strong> (22 dic) per Sydney con volo di <strong>13h 50m</strong> (+6 ore da Dubai).
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[11px]">
+              <div>
+                <p class="font-bold text-slate-800">1. A che ora locale di Dubai atterra il Volo 1?</p>
+                <p class="text-blue-900 font-semibold mt-0.5">Ora atterraggio Dubai: ___________________</p>
+              </div>
+              <div>
+                <p class="font-bold text-slate-800">2. In che data e a che ora atterra a Sydney?</p>
+                <p class="text-blue-900 font-semibold mt-0.5">Giorno e ora Sydney: ___________________</p>
+              </div>
+            </div>
+            <div class="mt-1.5 text-[11px]">
+              <span class="font-bold text-slate-800">3. A Sydney trova neve o spiaggia? Spiega perché (citando inclinazione asse):</span>
+              <div class="border border-slate-300 rounded p-1 bg-white h-7 text-slate-400 italic text-[10px]">Spiegazione sintetica della squadra...</div>
+            </div>
+          </div>
+
+          <!-- Sfida 1.2 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-blue-600">SFIDA 1.2</span> — L'Enigma dell'Asse Terrestre e delle Stagioni
+              </h3>
+              <span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">50 Punti • 20 min</span>
+            </div>
+
+            <div class="my-1 p-1 bg-slate-50 rounded border border-slate-200">
+              <svg viewBox="0 0 650 110" class="w-full h-auto max-h-20 bg-white rounded border border-slate-300">
+                <circle cx="45" cy="55" r="28" fill="#f59e0b"/>
+                <text x="45" y="58" font-size="8" font-weight="bold" fill="#78350f" text-anchor="middle">SOLE</text>
+                
+                <line x1="80" y1="40" x2="330" y2="40" stroke="#fbbf24" stroke-width="2"/>
+                <polygon points="330,40 322,37 322,43" fill="#fbbf24"/>
+                <line x1="80" y1="70" x2="330" y2="70" stroke="#fbbf24" stroke-width="2"/>
+                <polygon points="330,70 322,67 322,73" fill="#fbbf24"/>
+                <text x="200" y="34" font-size="8" fill="#b45309" font-weight="bold">Raggi Solari Paralleli</text>
+
+                <g transform="translate(420, 55)">
+                  <circle cx="0" cy="0" r="38" fill="#bae6fd" stroke="#0284c7" stroke-width="1.5"/>
+                  <line x1="-18" y1="-50" x2="18" y2="50" stroke="#ef4444" stroke-width="2" stroke-dasharray="3 2"/>
+                  <text x="-18" y="-53" font-size="7" font-weight="bold" fill="#dc2626" text-anchor="middle">Nord</text>
+                  <text x="18" y="58" font-size="7" font-weight="bold" fill="#dc2626" text-anchor="middle">Sud</text>
+                  <line x1="-38" y1="14" x2="38" y2="-14" stroke="#334155" stroke-width="1"/>
+                </g>
+
+                <rect x="490" y="10" width="150" height="90" rx="4" fill="#f8fafc" stroke="#cbd5e1"/>
+                <text x="565" y="24" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">SOLSTIZIO DI GIUGNO</text>
+                <text x="496" y="42" font-size="7.5" fill="#475569">• Emisfero Nord rivolto al Sole</text>
+                <text x="496" y="58" font-size="7.5" fill="#475569">• Raggi quasi perpendicolari (caldo)</text>
+                <text x="496" y="74" font-size="7.5" fill="#475569">• All'Equatore: 12h luce fisse</text>
+                <text x="496" y="90" font-size="7.5" fill="#475569">• Polo Nord: Sole 24h</text>
+              </svg>
+            </div>
+
+            <div class="text-[11px] text-slate-700 space-y-1.5 leading-tight">
+              <div class="flex items-center gap-4 font-bold">
+                <span>"Il 21 giugno fa caldo a Milano perché la Terra è più vicina al Sole":</span>
+                <label class="inline-flex items-center gap-1"><input type="checkbox" class="w-3.5 h-3.5"> VERO</label>
+                <label class="inline-flex items-center gap-1"><input type="checkbox" class="w-3.5 h-3.5"> FALSO</label>
+              </div>
+
+              <div class="bg-slate-50 p-1.5 rounded border border-slate-200 text-[10.5px]">
+                La causa delle stagioni è l'asse terrestre che è <strong>____________________</strong>. Il 21 giugno i raggi colpiscono in modo quasi <strong>____________________</strong> l'emisfero <strong>____________________</strong>, mentre cadono <strong>____________________</strong> sull'emisfero <strong>____________________</strong>.
+              </div>
+
+              <div class="flex justify-between items-center text-[10.5px] pt-0.5">
+                <span class="font-bold text-slate-800">Ore di luce e di buio all'Equatore ogni giorno dell'anno:</span>
+                <span class="font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded border">_____ ore di luce e _____ ore di buio.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+          <span>Unità Speciale Geo-Detectives • Convalida Gruppo</span>
+          <span class="font-mono font-bold text-blue-900">Punti Assegnati: _____ / 100</span>
+        </div>
+      </div>
+
+      <!-- DOSSIER 2 -->
+      <div id="dossier-2" class="a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+        <div>
+          <div class="bg-slate-50 border border-slate-300 rounded p-1 text-[10px] text-slate-600 mb-1.5 flex justify-between items-center">
+            <div><strong>DOSSIER 2:</strong> La Crosta Inquieta e l'Ispettore Clima</div>
+            <div><strong>DESTINATARIO:</strong> Squadre di studenti</div>
+            <div><strong>TEMPO:</strong> Incontro 2 (40 min indagine)</div>
+          </div>
+
+          <div class="border-b-2 border-emerald-600 pb-1 mb-2 flex justify-between items-center">
+            <div>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOSSIER 2 • LIVELLO 2</span>
+              <h2 class="text-base font-black text-slate-900 leading-tight">La Crosta Inquieta e l'Ispettore del Clima</h2>
+            </div>
+            <span class="text-[10px] bg-slate-100 font-mono font-bold px-2 py-0.5 rounded border">Max 100 pt • Min sblocco: 70 pt</span>
+          </div>
+
+          <!-- Sfida 2.1 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 mb-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-emerald-600">SFIDA 2.1</span> — Allarme Tettonico Globale e Margini di Placca
+              </h3>
+              <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">50 Punti • 20 min</span>
+            </div>
+
+            <div class="my-1 p-1 bg-slate-50 rounded border border-slate-200">
+              <svg viewBox="0 0 650 95" class="w-full h-auto max-h-20 bg-white rounded border border-slate-300">
+                <g transform="translate(10, 8)">
+                  <rect x="0" y="0" width="195" height="80" rx="4" fill="#f0fdf4" stroke="#86efac"/>
+                  <text x="97" y="14" font-size="8.5" font-weight="bold" fill="#166534" text-anchor="middle">SCONTRO (Convergenza)</text>
+                  <path d="M 40 32 L 85 32" stroke="#15803d" stroke-width="3"/>
+                  <polygon points="85,32 75,28 75,36" fill="#15803d"/>
+                  <path d="M 155 32 L 110 32" stroke="#15803d" stroke-width="3"/>
+                  <polygon points="110,32 120,28 120,36" fill="#15803d"/>
+                  <text x="97" y="52" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">Catena Montuosa o Fossa</text>
+                  <text x="97" y="66" font-size="7" fill="#475569" text-anchor="middle">Himalaya, Ande, Marianne</text>
+                </g>
+                <g transform="translate(225, 8)">
+                  <rect x="0" y="0" width="195" height="80" rx="4" fill="#eff6ff" stroke="#93c5fd"/>
+                  <text x="97" y="14" font-size="8.5" font-weight="bold" fill="#1e40af" text-anchor="middle">ALLONTANAMENTO (Divergenza)</text>
+                  <path d="M 80 32 L 35 32" stroke="#2563eb" stroke-width="3"/>
+                  <polygon points="35,32 45,28 45,36" fill="#2563eb"/>
+                  <path d="M 115 32 L 160 32" stroke="#2563eb" stroke-width="3"/>
+                  <polygon points="160,32 150,28 150,36" fill="#2563eb"/>
+                  <text x="97" y="52" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">Rift Valley o Dorsale</text>
+                  <text x="97" y="66" font-size="7" fill="#475569" text-anchor="middle">Risalita di nuovo magma</text>
+                </g>
+                <g transform="translate(440, 8)">
+                  <rect x="0" y="0" width="195" height="80" rx="4" fill="#fffbeb" stroke="#fde68a"/>
+                  <text x="97" y="14" font-size="8.5" font-weight="bold" fill="#92400e" text-anchor="middle">SCORRIMENTO (Trascorrenza)</text>
+                  <path d="M 45 28 L 150 28" stroke="#d97706" stroke-width="2.5"/>
+                  <polygon points="150,28 140,24 140,32" fill="#d97706"/>
+                  <path d="M 150 38 L 45 38" stroke="#d97706" stroke-width="2.5"/>
+                  <polygon points="45,38 55,34 55,42" fill="#d97706"/>
+                  <text x="97" y="55" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">Faglia con Attrito Sismico</text>
+                  <text x="97" y="68" font-size="7" fill="#475569" text-anchor="middle">Forte accumulo sismico</text>
+                </g>
+              </svg>
+            </div>
+
+            <table class="w-full text-[10.5px] text-left border border-slate-300 rounded overflow-hidden my-1">
+              <thead class="bg-slate-100 text-slate-800">
+                <tr>
+                  <th class="p-1 border">Struttura / Luogo</th>
+                  <th class="p-1 border">Placche Coinvolte</th>
+                  <th class="p-1 border">Movimento</th>
+                  <th class="p-1 border">Risultato Morfologico</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="p-1 font-bold border">A. Himalaya</td>
+                  <td class="p-1 border">Indiana ed Eurasiatica</td>
+                  <td class="p-1 border">___________________</td>
+                  <td class="p-1 border">___________________</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold border">B. Rift Valley</td>
+                  <td class="p-1 border">Africana, Somala, Arabica</td>
+                  <td class="p-1 border">___________________</td>
+                  <td class="p-1 border">___________________</td>
+                </tr>
+                <tr>
+                  <td class="p-1 font-bold border">C. Marianne</td>
+                  <td class="p-1 border">Pacifico e Filippine</td>
+                  <td class="p-1 border">___________________</td>
+                  <td class="p-1 border">___________________</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="text-[10.5px]">
+              <span class="font-bold text-slate-800">Perché terremoti e vulcani avvengono lungo i bordi e non al centro delle placche?</span>
+              <div class="border border-slate-300 rounded p-1 bg-white h-7 text-slate-400 italic text-[10px]">Spiegazione sintetica basata sui moti del magma...</div>
+            </div>
+          </div>
+
+          <!-- Sfida 2.2 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-emerald-600">SFIDA 2.2</span> — I Climi Gemelli ma Opposti alla Stessa Latitudine
+              </h3>
+              <span class="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">50 Punti • 20 min</span>
+            </div>
+
+            <div class="my-1 grid grid-cols-2 gap-2 text-center">
+              <div class="bg-slate-50 p-1.5 rounded border border-slate-300">
+                <div class="text-[10px] font-bold text-blue-900">LECCE • Alt: 53 m (Mare Mitigatore)</div>
+                <svg viewBox="0 0 280 80" class="w-full h-auto bg-white rounded border my-0.5">
+                  <rect x="20" y="30" width="10" height="45" fill="#38bdf8"/>
+                  <rect x="60" y="40" width="10" height="35" fill="#38bdf8"/>
+                  <rect x="100" y="55" width="10" height="20" fill="#38bdf8"/>
+                  <rect x="140" y="65" width="10" height="10" fill="#38bdf8"/>
+                  <rect x="180" y="45" width="10" height="30" fill="#38bdf8"/>
+                  <rect x="220" y="25" width="10" height="50" fill="#38bdf8"/>
+                  <path d="M 20 50 Q 140 18 260 50" fill="none" stroke="#ef4444" stroke-width="2"/>
+                  <text x="140" y="14" font-size="7" font-weight="bold" fill="#dc2626" text-anchor="middle">Estate Calda (~26°C) • Inverno Mite (~10°C)</text>
+                </svg>
+              </div>
+
+              <div class="bg-slate-50 p-1.5 rounded border border-slate-300">
+                <div class="text-[10px] font-bold text-amber-900">SALT LAKE CITY • Alt: 1347 m (Continentale Arido)</div>
+                <svg viewBox="0 0 280 80" class="w-full h-auto bg-white rounded border my-0.5">
+                  <rect x="20" y="50" width="10" height="25" fill="#38bdf8"/>
+                  <rect x="60" y="45" width="10" height="30" fill="#38bdf8"/>
+                  <rect x="100" y="40" width="10" height="35" fill="#38bdf8"/>
+                  <rect x="140" y="62" width="10" height="13" fill="#38bdf8"/>
+                  <rect x="180" y="55" width="10" height="20" fill="#38bdf8"/>
+                  <rect x="220" y="48" width="10" height="27" fill="#38bdf8"/>
+                  <path d="M 20 68 Q 140 10 260 70" fill="none" stroke="#ef4444" stroke-width="2"/>
+                  <text x="140" y="14" font-size="7" font-weight="bold" fill="#dc2626" text-anchor="middle">Estate Torrida (~28°C) • Inverno Gelo (&lt; 0°C)</text>
+                </svg>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[10.5px]">
+              <div>1. Città con escursione termica contenuta dal mare: <strong>________________</strong></div>
+              <div>2. Città continentale con inverni gelidi: <strong>________________</strong></div>
+            </div>
+            <div class="mt-1 text-[10.5px]">
+              <span class="font-bold text-slate-800">3. I DUE fattori geografici che causano questa differenza alla stessa latitudine:</span>
+              <div class="grid grid-cols-2 gap-2 mt-0.5 font-medium">
+                <div>Fattore A: _______________________________</div>
+                <div>Fattore B: _______________________________</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+          <span>Unità Speciale Geo-Detectives • Convalida Gruppo</span>
+          <span class="font-mono font-bold text-emerald-900">Punti Assegnati: _____ / 100</span>
+        </div>
+      </div>
+
+      <!-- DOSSIER 3 -->
+      <div id="dossier-3" class="a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+        <div>
+          <div class="bg-slate-50 border border-slate-300 rounded p-1 text-[10px] text-slate-600 mb-1.5 flex justify-between items-center">
+            <div><strong>DOSSIER 3:</strong> I Polmoni Feriti della Biosfera</div>
+            <div><strong>DESTINATARIO:</strong> Squadre di studenti</div>
+            <div><strong>TEMPO:</strong> Incontro 3 (40 min indagine)</div>
+          </div>
+
+          <div class="border-b-2 border-amber-600 pb-1 mb-2 flex justify-between items-center">
+            <div>
+              <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOSSIER 3 • LIVELLO 3</span>
+              <h2 class="text-base font-black text-slate-900 leading-tight">I Polmoni Feriti della Biosfera</h2>
+            </div>
+            <span class="text-[10px] bg-slate-100 font-mono font-bold px-2 py-0.5 rounded border">Max 100 pt • Min sblocco: 70 pt</span>
+          </div>
+
+          <!-- Sfida 3.1 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 mb-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-amber-600">SFIDA 3.1</span> — Identikit dei Grandi Biomi Mondiali
+              </h3>
+              <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">40 Punti • 15 min</span>
+            </div>
+
+            <div class="my-1 p-1 bg-slate-50 rounded border border-slate-200">
+              <svg viewBox="0 0 650 95" class="w-full h-auto max-h-20 bg-white rounded border border-slate-300">
+                <rect x="8" y="8" width="150" height="80" rx="4" fill="#f0fdf4" stroke="#86efac"/>
+                <text x="83" y="20" font-size="8" font-weight="bold" fill="#15803d" text-anchor="middle">4. STRATO EMERGENTE</text>
+                <text x="83" y="32" font-size="7" font-weight="bold" fill="#047857" text-anchor="middle">(&gt; 50-60 metri)</text>
+                <text x="83" y="52" font-size="7" fill="#334155" text-anchor="middle">Chiome altissime che</text>
+                <text x="83" y="64" font-size="7" fill="#334155" text-anchor="middle">catturano la luce.</text>
+
+                <rect x="170" y="8" width="150" height="80" rx="4" fill="#ecfdf5" stroke="#a7f3d0"/>
+                <text x="245" y="20" font-size="8" font-weight="bold" fill="#065f46" text-anchor="middle">3. VOLTA (CANOPY)</text>
+                <text x="245" y="32" font-size="7" font-weight="bold" fill="#059669" text-anchor="middle">(30 - 40 metri)</text>
+                <text x="245" y="52" font-size="7" fill="#334155" text-anchor="middle">Tetto verde continuo,</text>
+                <text x="245" y="64" font-size="7" fill="#334155" text-anchor="middle">90% specie animali.</text>
+
+                <rect x="332" y="8" width="150" height="80" rx="4" fill="#fefce8" stroke="#fef08a"/>
+                <text x="407" y="20" font-size="8" font-weight="bold" fill="#854d0e" text-anchor="middle">2. SOTTOBOSCO</text>
+                <text x="407" y="32" font-size="7" font-weight="bold" fill="#ca8a04" text-anchor="middle">(10 - 25 metri)</text>
+                <text x="407" y="52" font-size="7" fill="#334155" text-anchor="middle">Penombra e umidità:</text>
+                <text x="407" y="64" font-size="7" fill="#334155" text-anchor="middle">arbusti, felci, giaguari.</text>
+
+                <rect x="494" y="8" width="148" height="80" rx="4" fill="#fef2f2" stroke="#fecaca"/>
+                <text x="568" y="20" font-size="8" font-weight="bold" fill="#991b1b" text-anchor="middle">1. LIVELLO SUOLO</text>
+                <text x="568" y="32" font-size="7" font-weight="bold" fill="#dc2626" text-anchor="middle">(0 - 5 metri)</text>
+                <text x="568" y="52" font-size="7" fill="#334155" text-anchor="middle">Fondo scuro. Humus</text>
+                <text x="568" y="64" font-size="7" fill="#334155" text-anchor="middle">dilavato dalle piogge.</text>
+              </svg>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[10.5px] mt-1">
+              <div class="p-1 bg-slate-50 rounded border">
+                1. <strong>____________________</strong>: Suolo permafrost gelato; solo muschi, licheni e arbusti nani.
+              </div>
+              <div class="p-1 bg-slate-50 rounded border">
+                2. <strong>____________________</strong>: Foresta di conifere (aghifoglie) di Siberia e Canada; legname.
+              </div>
+              <div class="p-1 bg-slate-50 rounded border">
+                3. <strong>____________________</strong>: Clima equatoriale, piogge 300 gg/anno, 4 strati verticali.
+              </div>
+              <div class="p-1 bg-slate-50 rounded border">
+                4. <strong>____________________</strong>: Distesa erbacea tropicale con alternanza piogge/siccità; grandi erbivori.
+              </div>
+            </div>
+          </div>
+
+          <!-- Sfida 3.2 -->
+          <div class="border border-slate-300 rounded-lg p-2.5 bg-white">
+            <div class="flex justify-between items-center border-b pb-1 mb-1.5">
+              <h3 class="font-black text-slate-800 text-xs flex items-center gap-1.5">
+                <span class="text-amber-600">SFIDA 3.2</span> — Analisi Lettera Indigena e Manifesto Amazzonia
+              </h3>
+              <span class="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200">60 Punti • 25 min</span>
+            </div>
+
+            <div class="bg-amber-50 border-l-4 border-amber-600 p-2 text-[10.5px] text-amber-950 rounded-r mb-2 leading-tight">
+              <strong>Dalla "Lettera per salvare l'Amazzonia" (Kopenawa, Raoni, Sonia Bone):</strong><br>
+              <em>«Nel nome del profitto ci rubano la terra, incendiano le foreste, inquinano i fiumi. I nostri parenti incontattati vengono attaccati... Il governo modifica le leggi per allevatori, agricoltori e miniere... Proteggiamo la foresta perché ci dà la vita!»</em>
+            </div>
+
+            <div class="space-y-1.5 text-[10.5px]">
+              <div>
+                <span class="font-bold text-slate-800">1. Attività economiche distruttive:</span>
+                <span class="text-slate-700"> Attività A: ___________________________ &nbsp;&nbsp; Attività B: ___________________________</span>
+              </div>
+              <div>
+                <span class="font-bold text-slate-800">2. Chi sono i "parenti incontattati" e perché sono così fragili?</span>
+                <div class="border border-slate-300 rounded p-1 bg-white h-7 text-slate-400 italic text-[10px]">Risposta sintetica...</div>
+              </div>
+              <div>
+                <span class="font-black text-slate-900 uppercase text-[10px]">3. IL MANIFESTO AMG (3 Azioni concrete di tutela da inviare ai governi):</span>
+                <div class="space-y-0.5 mt-0.5 font-medium">
+                  <div>1: ________________________________________________________________________________</div>
+                  <div>2: ________________________________________________________________________________</div>
+                  <div>3: ________________________________________________________________________________</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+          <span>Unità Speciale Geo-Detectives • Convalida Gruppo</span>
+          <span class="font-mono font-bold text-amber-900">Punti Assegnati: _____ / 100</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 5.3. BADGE DA STAMPARE (A4 RIGIDO • MISURA 78 x 46 mm)    -->
+    <!-- ======================================================== -->
+    <section id="badge-sec" class="content-sec a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+      <div>
+        <div class="bg-slate-50 border border-slate-300 rounded p-1 text-[10px] text-slate-600 mb-2 flex justify-between items-center">
+          <div><strong>DOC. 5.3:</strong> Foglietto Badge Operativi Ufficiali AMG</div>
+          <div><strong>DESTINATARIO:</strong> Studenti (consegnati dal docente)</div>
+          <div><strong>USO:</strong> Fine di ciascun incontro</div>
+        </div>
+
+        <div class="border-b-2 border-purple-600 pb-1 mb-3 flex justify-between items-center">
+          <div>
+            <span class="bg-purple-100 text-purple-900 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOCUMENTO UFFICIALE 5.3</span>
+            <h2 class="text-lg font-black text-slate-900 leading-tight">BADGE UFFICIALI OPERATIVI AMG</h2>
+            <p class="text-[11px] text-slate-600">Ritagliare lungo il tratteggio esterno. Dimensioni <strong>78 × 46 mm</strong> per perfetto alloggiamento nel Passaporto 5.1</p>
+          </div>
+          <span class="text-[10px] bg-slate-100 font-mono font-bold px-2 py-0.5 rounded border">Set 4 Badge Ufficiali</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 place-items-center my-2">
+          
+          <!-- BADGE 1 -->
+          <div class="badge-slot-size border-2 border-dashed border-blue-600 p-2 rounded-lg bg-blue-50/60 badge-stamp flex flex-col justify-between box-border">
+            <div>
+              <div class="flex items-center justify-between text-[9px] text-blue-900 font-bold border-b border-blue-200 pb-0.5">
+                <span class="tracking-wider">AMG • LIV. 1</span>
+                <span class="bg-blue-200 px-1 rounded font-mono">BADGE 1</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg viewBox="0 0 60 60" class="w-8 h-8 shrink-0 text-blue-600">
+                  <circle cx="30" cy="30" r="26" fill="#dbeafe" stroke="currentColor" stroke-width="2.5"/>
+                  <circle cx="30" cy="30" r="18" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+                  <line x1="30" y1="30" x2="30" y2="19" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="30" y1="30" x2="39" y2="30" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="leading-tight">
+                  <div class="font-black text-[11px] text-blue-950 uppercase">MASTER DEL TEMPO</div>
+                  <div class="text-[8px] text-blue-700 font-bold">FUSI ORARI & ASTRONOMIA</div>
+                </div>
+              </div>
+              <p class="text-[8px] text-slate-600 leading-tight mt-1">Certifica: calcolo esatto fusi orari, cambio data e spiegazione asse terrestre.</p>
+            </div>
+            <div class="pt-0.5 border-t border-blue-200 flex justify-between text-[8px] text-slate-500 font-mono">
+              <span>Firma: Prof. Docente</span>
+              <span>Pt: $\ge$ 70/100</span>
+            </div>
+          </div>
+
+          <!-- BADGE 2 -->
+          <div class="badge-slot-size border-2 border-dashed border-emerald-600 p-2 rounded-lg bg-emerald-50/60 badge-stamp flex flex-col justify-between box-border">
+            <div>
+              <div class="flex items-center justify-between text-[9px] text-emerald-900 font-bold border-b border-emerald-200 pb-0.5">
+                <span class="tracking-wider">AMG • LIV. 2</span>
+                <span class="bg-emerald-200 px-1 rounded font-mono">BADGE 2</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg viewBox="0 0 60 60" class="w-8 h-8 shrink-0 text-emerald-600">
+                  <circle cx="30" cy="30" r="26" fill="#d1fae5" stroke="currentColor" stroke-width="2.5"/>
+                  <polygon points="14,46 46,46 36,25 24,25" fill="#475569"/>
+                  <polygon points="24,25 36,25 32,19 28,19" fill="#ef4444"/>
+                </svg>
+                <div class="leading-tight">
+                  <div class="font-black text-[11px] text-emerald-950 uppercase">SISMOLOGO DEL PIANETA</div>
+                  <div class="text-[8px] text-emerald-700 font-bold">TETTONICA & CLIMI</div>
+                </div>
+              </div>
+              <p class="text-[8px] text-slate-600 leading-tight mt-1">Certifica: associazione margini di placca e lettura comparata climogrammi.</p>
+            </div>
+            <div class="pt-0.5 border-t border-emerald-200 flex justify-between text-[8px] text-slate-500 font-mono">
+              <span>Firma: Prof. Docente</span>
+              <span>Pt: $\ge$ 70/100</span>
+            </div>
+          </div>
+
+          <!-- BADGE 3 -->
+          <div class="badge-slot-size border-2 border-dashed border-amber-600 p-2 rounded-lg bg-amber-50/60 badge-stamp flex flex-col justify-between box-border">
+            <div>
+              <div class="flex items-center justify-between text-[9px] text-amber-900 font-bold border-b border-amber-200 pb-0.5">
+                <span class="tracking-wider">AMG • LIV. 3</span>
+                <span class="bg-amber-200 px-1 rounded font-mono">BADGE 3</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg viewBox="0 0 60 60" class="w-8 h-8 shrink-0 text-amber-600">
+                  <circle cx="30" cy="30" r="26" fill="#fef3c7" stroke="currentColor" stroke-width="2.5"/>
+                  <path d="M 30 14 C 20 20 18 36 30 46 C 42 36 40 20 30 14 Z" fill="#16a34a"/>
+                  <line x1="30" y1="18" x2="30" y2="46" stroke="#14532d" stroke-width="1.5"/>
+                </svg>
+                <div class="leading-tight">
+                  <div class="font-black text-[11px] text-amber-950 uppercase">CUSTODE BIOSFERA</div>
+                  <div class="text-[8px] text-amber-700 font-bold">BIOMI & ECOLOGIA</div>
+                </div>
+              </div>
+              <p class="text-[8px] text-slate-600 leading-tight mt-1">Certifica: classificazione biomi e stesura del manifesto tutela Amazzonia.</p>
+            </div>
+            <div class="pt-0.5 border-t border-amber-200 flex justify-between text-[8px] text-slate-500 font-mono">
+              <span>Firma: Prof. Docente</span>
+              <span>Pt: $\ge$ 70/100</span>
+            </div>
+          </div>
+
+          <!-- BADGE 4: ÉLITE FINALE -->
+          <div class="badge-slot-size border-2 border-dashed border-indigo-600 p-2 rounded-lg bg-indigo-50/60 badge-stamp flex flex-col justify-between box-border">
+            <div>
+              <div class="flex items-center justify-between text-[9px] text-indigo-950 font-bold border-b border-indigo-200 pb-0.5">
+                <span class="tracking-wider">AMG • TITOLO D'ÉLITE</span>
+                <span class="bg-indigo-200 px-1 rounded font-mono text-indigo-900">MASTER</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg viewBox="0 0 60 60" class="w-8 h-8 shrink-0 text-indigo-600">
+                  <circle cx="30" cy="30" r="26" fill="#e0e7ff" stroke="currentColor" stroke-width="2.5"/>
+                  <polygon points="30,12 35,22 46,24 38,32 40,43 30,37 20,43 22,32 14,24 25,22" fill="#eab308" stroke="#ca8a04" stroke-width="1.2"/>
+                </svg>
+                <div class="leading-tight">
+                  <div class="font-black text-[11px] text-indigo-950 uppercase">GEO-DETECTIVE D'ÉLITE</div>
+                  <div class="text-[8px] text-indigo-700 font-bold">TITOLO D'ONORE CLASSE 3ª</div>
+                </div>
+              </div>
+              <p class="text-[8px] text-slate-600 leading-tight mt-1">Certifica: superamento con successo di tutti e tre i dossier operativi.</p>
+            </div>
+            <div class="pt-0.5 border-t border-indigo-200 flex justify-between text-[8px] text-slate-500 font-mono">
+              <span>Validazione AMG</span>
+              <span>A.S. 2025/2026</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+        <span>Foglietto Badge Stampabile • Tagliare con le forbici lungo il bordo tratteggiato</span>
+        <span class="font-mono">Coerenza 1:1 con Passaporto 5.1</span>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 5.5. FOGLIO RAPIDO PER IL DOCENTE (A4 SINGOLO FOGLIO)    -->
+    <!-- ======================================================== -->
+    <section id="docente-sec" class="content-sec a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+      <div>
+        <div class="bg-red-50 border border-red-200 rounded p-1 text-[10px] text-red-700 mb-1.5 flex justify-between items-center">
+          <div><strong>DOC. 5.5:</strong> Master Guide Riservata Docente</div>
+          <div><strong>DESTINATARIO:</strong> Solo Docente</div>
+          <div><strong>USO:</strong> Correzione rapida al banco</div>
+        </div>
+
+        <div class="border-b-2 border-red-600 pb-1 mb-2 flex justify-between items-center">
+          <div>
+            <span class="bg-red-100 text-red-800 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">CHIAVE DI CORREZIONE RAPIDA</span>
+            <h2 class="text-base font-black text-slate-900 leading-tight">MASTER GUIDE SOLUZIONI & TEMPI</h2>
+          </div>
+          <span class="text-[10px] bg-red-100 text-red-900 font-bold px-2 py-0.5 rounded border border-red-200">Tempo check &lt; 60 sec</span>
+        </div>
+
+        <div class="space-y-2 text-[10.5px]">
+          <div class="bg-slate-50 p-2 rounded border border-slate-200">
+            <strong class="text-blue-900 block border-b pb-0.5 mb-1">DOSSIER 1 (Incontro 1 — Fusi & Astronomia)</strong>
+            <p>• <strong>Sfida 1.1:</strong> Dubai: 11:50 + 4h40 = 16:30 (+3 fusi) $\rightarrow$ <strong>19:30 del 22 dicembre</strong>. Sydney: 21:30 + 13h50 = 11:20 (+6 fusi) $\rightarrow$ <strong>17:20 del 23 dicembre</strong>. Trova <strong>piena estate/spiaggia</strong> (emisfero australe a dicembre).</p>
+            <p>• <strong>Sfida 1.2:</strong> <strong>FALSO</strong>. Parole mancanti: <em>inclinato, perpendicolari, boreale, obliqui, australe</em>. Equatore: <strong>12 ore luce e 12 ore buio</strong>.</p>
+          </div>
+
+          <div class="bg-slate-50 p-2 rounded border border-slate-200">
+            <strong class="text-emerald-900 block border-b pb-0.5 mb-1">DOSSIER 2 (Incontro 2 — Tettonica & Climi)</strong>
+            <p>• <strong>Sfida 2.1:</strong> Himalaya: <strong>Scontro / Catena Montuosa</strong>. Rift Valley: <strong>Allontanamento / Fossa tettonica</strong>. Marianne: <strong>Scontro (subduzione) / Fossa oceanica</strong>. Terremoti/vulcani sui bordi: punti di frattura/attrito spinti dai moti convettivi del magma.</p>
+            <p>• <strong>Sfida 2.2:</strong> Mediterraneo: <strong>Lecce</strong>. Continentale arido: <strong>Salt Lake City</strong>. Fattori: 1) <strong>Altitudine</strong> (53 m vs 1347 m); 2) <strong>Distanza dal mare/Continentalità</strong>.</p>
+          </div>
+
+          <div class="bg-slate-50 p-2 rounded border border-slate-200">
+            <strong class="text-amber-900 block border-b pb-0.5 mb-1">DOSSIER 3 (Incontro 3 — Biomi & Amazzonia)</strong>
+            <p>• <strong>Sfida 3.1:</strong> 1. <strong>Tundra</strong> | 2. <strong>Taiga</strong> | 3. <strong>Foresta Pluviale</strong> | 4. <strong>Savana</strong>.</p>
+            <p>• <strong>Sfida 3.2:</strong> Cause deforestazione: pascoli per bestiame, miniere, legname, agricoltura estensiva. Popoli incontattati: tribù isolate prive di difese immunitarie. Manifesto: sanzioni, stop miniere illegali, tutela riserve.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+        <span>Soglia badge: $\ge 70$ punti. In caso di insufficienza: 1 domanda orale di recupero immediato.</span>
+        <span class="font-mono">AMG Docente</span>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- 5.6. CARTE STRUMENTALI OPERATIVE (A4 SINGOLO FOGLIO)     -->
+    <!-- ======================================================== -->
+    <section id="carte-sec" class="content-sec a4-sheet bg-white p-5 rounded-2xl shadow-sm border border-slate-200 card-box flex flex-col justify-between">
+      <div>
+        <div class="bg-slate-50 border border-slate-300 rounded p-1 text-[10px] text-slate-600 mb-2 flex justify-between items-center">
+          <div><strong>DOC. 5.6:</strong> Carte Strumentali Operative AMG</div>
+          <div><strong>DESTINATARIO:</strong> Squadre (1 set per gruppo)</div>
+          <div><strong>USO:</strong> Momenti di stallo (monouso)</div>
+        </div>
+
+        <div class="border-b-2 border-slate-800 pb-1 mb-3 flex justify-between items-center">
+          <div>
+            <span class="bg-slate-200 text-slate-900 text-[10px] font-black px-2 py-0.5 rounded uppercase font-mono">DOCUMENTO UFFICIALE 5.6</span>
+            <h2 class="text-lg font-black text-slate-900 leading-tight">CARTE STRUMENTALI OPERATIVE AMG</h2>
+            <p class="text-[11px] text-slate-600">Ritagliare e consegnare 1 coppia per squadra a inizio percorso. Ciascuna carta è monouso.</p>
+          </div>
+          <span class="text-[10px] bg-slate-100 font-mono font-bold px-2 py-0.5 rounded border">2 Coupon per Squadra</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 my-2">
+          
+          <!-- CARTA 1 -->
+          <div class="border-2 border-slate-900 p-3.5 rounded-xl bg-amber-50/70 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-900 pb-1 mb-2">
+                <span class="font-black text-[10px] uppercase text-slate-900">STRUMENTO 1</span>
+                <svg viewBox="0 0 24 24" class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </div>
+              <h4 class="font-black text-sm text-amber-950 uppercase">LENTE D'INGRANDIMENTO</h4>
+              <div class="text-[10px] font-bold text-amber-800 uppercase mb-2">Aiuto Diretto del Docente</div>
+              <p class="text-[10.5px] text-slate-700 leading-snug">
+                Consegna questa carta al docente quando la squadra è bloccata.
+                <br><br>
+                <strong>Effetto:</strong> Il docente eliminerà un'opzione errata o fornirà un indizio-guida fondamentale <strong>senza penalizzare il punteggio</strong>.
+              </p>
+            </div>
+            <div class="mt-4 pt-1.5 border-t border-slate-400 flex justify-between text-[9px] text-slate-600 font-mono">
+              <span class="font-bold">[ MONOUSO: 1 UTILIZZO ]</span>
+              <span>Squadra: ______________</span>
+            </div>
+          </div>
+
+          <!-- CARTA 2 -->
+          <div class="border-2 border-slate-900 p-3.5 rounded-xl bg-blue-50/70 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-slate-900 pb-1 mb-2">
+                <span class="font-black text-[10px] uppercase text-slate-900">STRUMENTO 2</span>
+                <svg viewBox="0 0 24 24" class="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+              </div>
+              <h4 class="font-black text-sm text-blue-950 uppercase">CONSULTO DEGLI ISPETTORI</h4>
+              <div class="text-[10px] font-bold text-blue-800 uppercase mb-2">Cooperazione Strategica tra Gruppi</div>
+              <p class="text-[10.5px] text-slate-700 leading-snug">
+                Consegna questa carta per inviare un delegato al tavolo di un'altra squadra.
+                <br><br>
+                <strong>Effetto:</strong> Avete a disposizione <strong>90 secondi di confronto libero</strong> per verificare insieme un calcolo o chiarire un dubbio cartografico.
+              </p>
+            </div>
+            <div class="mt-4 pt-1.5 border-t border-slate-400 flex justify-between text-[9px] text-slate-600 font-mono">
+              <span class="font-bold">[ MONOUSO: 1 UTILIZZO ]</span>
+              <span>Squadra: ______________</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="mt-2 pt-1 border-t text-[10px] text-slate-500 flex justify-between">
+        <span>Foglietto Coupon Stampabile • Ritagliare e distribuire 1 coppia per tavolo</span>
+        <span class="font-mono">AMG Operazioni</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: MOTORE DI SINCRONIZZAZIONE BIDIREZIONALE TXT -->
+  <!-- ======================================================== -->
+  <script>
+    // Dati iniziali corrispondenti a registro_gamification_geo_detectives.txt
+    const DEFAULT_TXT_REGISTER = `# ==============================================================================
+# ARCHIVIO CENTRALE DI STATO E SINCRONIZZAZIONE: GEO-DETECTIVES
+# Unità Didattica: Il Pianeta Vivente (Classe 3ª - Secondaria di I Grado)
+# Disciplina: Geografia | Modalità: Gamification Cooperativa
+# ==============================================================================
+
+[CSV_TABELLONE_SINCRONIZZABILE]
+ID,Squadra,Capo,Cartografo,Tempo,Portavoce,BES,Pt_D1,Badge_D1,Pt_D2,Badge_D2,Pt_D3,Badge_D3,Punti_Tot,Badge_Tot,Carte_Rimaste,Privilegio,Stato_Finale
+1,Squadra Alpha,Marco Rossi,Chiara Bianchi,Luca Verdi,Sara Neri,NO,95,SI,90,SI,90,SI,275,3,1,Scelta del Ruolo prioritario,QUALIFICATO_ELITE
+2,Squadra Beta,Giulia Ferrari,Matteo Conti,Elena Esposito,Federico Russo,NO,85,SI,85,SI,80,SI,250,3,2,Nessuno,QUALIFICATO_ELITE
+3,Squadra Gamma,Davide Romano,Sofia Colombo,Simone Ricci,Alice Marino,NO,90,SI,80,SI,85,SI,255,3,1,Nessuno,QUALIFICATO_ELITE
+4,Squadra Delta,Alessio De Luca,Lorenzo Gallo,Martina Costa,Gabriele Fontana,SI,75,SI,75,SI,70,SI,220,3,0,Supporto visivo permanente,QUALIFICATO_STANDARD
+5,Squadra Epsilon,Francesca Barbieri,Christian Serra,Aurora Moretti,Tommaso Rinaldi,NO,80,SI,75,SI,75,SI,230,3,1,Nessuno,QUALIFICATO_STANDARD
+6,Squadra Zeta,Leonardo Santoro,Camilla Villa,Mattia Vitale,Beatrice Caruso,NO,75,SI,70,SI,75,SI,220,3,0,Nessuno,QUALIFICATO_STANDARD`;
+
+    // Stato delle squadre in memoria per sincronizzazione istantanea
+    let teamsData = [];
+
+    // Parser universale per il file TXT (legge la sezione CSV sincronizzabile)
+    function parseTxtContent(txt) {
+      const lines = txt.split('\n');
+      const teams = [];
+      let inCsv = false;
+
+      for (let rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('#')) continue;
+
+        if (line === '[CSV_TABELLONE_SINCRONIZZABILE]' || line === '[CSV_TABELLONE]') {
+          inCsv = true;
+          continue;
+        }
+
+        if (inCsv) {
+          if (line.startsWith('[')) {
+            inCsv = false;
+            continue;
+          }
+
+          if (line.startsWith('ID,') || line.startsWith('ID;')) continue;
+
+          const separator = line.includes(';') ? ';' : ',';
+          const parts = line.split(separator);
+
+          if (parts.length >= 14) {
+            const pt1 = parseInt(parts[7]) || 0;
+            const pt2 = parseInt(parts[9]) || 0;
+            const pt3 = parseInt(parts[11]) || 0;
+            const b1 = (parts[8] || '').trim().toUpperCase() === 'SI';
+            const b2 = (parts[10] || '').trim().toUpperCase() === 'SI';
+            const b3 = (parts[12] || '').trim().toUpperCase() === 'SI';
+            const sumPt = pt1 + pt2 + pt3;
+            const badgeCount = (b1 ? 1 : 0) + (b2 ? 1 : 0) + (b3 ? 1 : 0);
+
+            teams.push({
+              id: parseInt(parts[0]),
+              name: parts[1],
+              capo: parts[2],
+              cartografo: parts[3],
+              tempo: parts[4],
+              portavoce: parts[5],
+              bes: (parts[6] || '').trim().toUpperCase() === 'SI',
+              pt1: pt1,
+              b1: b1,
+              pt2: pt2,
+              b2: b2,
+              pt3: pt3,
+              b3: b3,
+              totale: parts[13] ? parseInt(parts[13]) : sumPt,
+              badgeTot: parts[14] ? parseInt(parts[14]) : badgeCount,
+              carteRimaste: parts[15] !== undefined ? parseInt(parts[15]) : 1,
+              privilegio: parts[16] || 'Nessuno',
+              stato: parts[17] || (sumPt >= 240 && badgeCount === 3 ? 'QUALIFICATO_ELITE' : 'QUALIFICATO_STANDARD')
+            });
+          }
+        }
+      }
+      return teams;
+    }
+
+    // Rendering della Tabella Interattiva LIM con campi editabili
+    function renderDashboard() {
+      const tbody = document.getElementById('dashboard-body');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      let totalPoints = 0;
+      let totalBadges = 0;
+
+      teamsData.forEach((t, index) => {
+        // Ricalcolo dinamico
+        t.totale = t.pt1 + t.pt2 + t.pt3;
+        t.badgeTot = (t.b1 ? 1 : 0) + (t.b2 ? 1 : 0) + (t.b3 ? 1 : 0);
+        if (t.badgeTot === 3 && t.totale >= 240) {
+          t.stato = 'QUALIFICATO_ELITE';
+        } else if (t.badgeTot === 3 && t.totale >= 210) {
+          t.stato = 'QUALIFICATO_STANDARD';
+        }
+
+        totalPoints += t.totale;
+        totalBadges += t.badgeTot;
+
+        const isElite = t.stato.includes('ELITE');
+        const statusBadge = isElite 
+          ? `<span class="bg-indigo-100 text-indigo-900 font-black px-2 py-0.5 rounded text-[10px] border border-indigo-300">⭐ ÉLITE</span>`
+          : `<span class="bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded text-[10px] border border-emerald-300">✓ STANDARD</span>`;
+
+        const besTag = t.bes ? ` <span class="bg-amber-100 text-amber-900 px-1 py-0.5 rounded font-bold text-[9px] border border-amber-300">[BES]</span>` : '';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-1.5 font-bold border text-slate-900">${t.name} ${besTag}</td>
+          <td class="p-1.5 border text-slate-700">
+            <span class="font-semibold text-blue-900">${t.capo}</span>, 
+            <span class="text-emerald-900">${t.cartografo}</span>, 
+            <span class="text-amber-900">${t.tempo}</span>, 
+            <span class="text-purple-900">${t.portavoce}</span>
+          </td>
+          <!-- Dossier 1 -->
+          <td class="p-1.5 border text-center font-mono">
+            <div class="flex items-center justify-center gap-1">
+              <input type="number" min="0" max="100" value="${t.pt1}" onchange="updateTeamScore(${index}, 1, this.value)" class="w-11 text-center font-bold bg-white border border-slate-300 rounded p-0.5 text-xs text-blue-950 focus:border-blue-600 focus:outline-none">
+              <button onclick="toggleBadge(${index}, 1)" title="Clicca per commutare il badge" class="text-xs px-1 py-0.5 rounded ${t.b1 ? 'bg-blue-100 text-blue-800 border border-blue-300 font-bold' : 'bg-slate-100 text-slate-400'}">
+                ${t.b1 ? '🏅' : '✕'}
+              </button>
+            </div>
+          </td>
+          <!-- Dossier 2 -->
+          <td class="p-1.5 border text-center font-mono">
+            <div class="flex items-center justify-center gap-1">
+              <input type="number" min="0" max="100" value="${t.pt2}" onchange="updateTeamScore(${index}, 2, this.value)" class="w-11 text-center font-bold bg-white border border-slate-300 rounded p-0.5 text-xs text-emerald-950 focus:border-emerald-600 focus:outline-none">
+              <button onclick="toggleBadge(${index}, 2)" title="Clicca per commutare il badge" class="text-xs px-1 py-0.5 rounded ${t.b2 ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold' : 'bg-slate-100 text-slate-400'}">
+                ${t.b2 ? '🏅' : '✕'}
+              </button>
+            </div>
+          </td>
+          <!-- Dossier 3 -->
+          <td class="p-1.5 border text-center font-mono">
+            <div class="flex items-center justify-center gap-1">
+              <input type="number" min="0" max="100" value="${t.pt3}" onchange="updateTeamScore(${index}, 3, this.value)" class="w-11 text-center font-bold bg-white border border-slate-300 rounded p-0.5 text-xs text-amber-950 focus:border-amber-600 focus:outline-none">
+              <button onclick="toggleBadge(${index}, 3)" title="Clicca per commutare il badge" class="text-xs px-1 py-0.5 rounded ${t.b3 ? 'bg-amber-100 text-amber-800 border border-amber-300 font-bold' : 'bg-slate-100 text-slate-400'}">
+                ${t.b3 ? '🏅' : '✕'}
+              </button>
+            </div>
+          </td>
+          <!-- Totale Punti -->
+          <td class="p-1.5 border text-center font-black font-mono text-blue-900 bg-slate-50 text-xs">
+            ${t.totale}
+          </td>
+          <!-- Totale Badge -->
+          <td class="p-1.5 border text-center font-mono font-bold text-amber-700 text-xs">
+            ${t.badgeTot} / 3
+          </td>
+          <!-- Stato Finale -->
+          <td class="p-1.5 border text-center">
+            ${statusBadge}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Aggiorna contatori in alto
+      document.getElementById('stat-badges-count').textContent = `${totalBadges} / ${teamsData.length * 3}`;
+      document.getElementById('stat-points-count').textContent = `${totalPoints} pt`;
+      document.getElementById('stat-teams-count').textContent = `${teamsData.length}`;
+
+      // Aggiorna anche il Passaporto correntemente visualizzato
+      const currentTeamId = document.getElementById('team-selector-quick').value;
+      autoFillPassport(currentTeamId);
+    }
+
+    // Aggiornamento del punteggio da input tabellare
+    function updateTeamScore(teamIndex, dossierNum, value) {
+      const parsedVal = Math.max(0, Math.min(100, parseInt(value) || 0));
+      if (dossierNum === 1) {
+        teamsData[teamIndex].pt1 = parsedVal;
+        teamsData[teamIndex].b1 = parsedVal >= 70;
+      } else if (dossierNum === 2) {
+        teamsData[teamIndex].pt2 = parsedVal;
+        teamsData[teamIndex].b2 = parsedVal >= 70;
+      } else if (dossierNum === 3) {
+        teamsData[teamIndex].pt3 = parsedVal;
+        teamsData[teamIndex].b3 = parsedVal >= 70;
+      }
+      renderDashboard();
+      notifyDataModified();
+    }
+
+    // Commutazione manuale del badge
+    function toggleBadge(teamIndex, dossierNum) {
+      if (dossierNum === 1) teamsData[teamIndex].b1 = !teamsData[teamIndex].b1;
+      if (dossierNum === 2) teamsData[teamIndex].b2 = !teamsData[teamIndex].b2;
+      if (dossierNum === 3) teamsData[teamIndex].b3 = !teamsData[teamIndex].b3;
+      renderDashboard();
+      notifyDataModified();
+    }
+
+    function notifyDataModified() {
+      document.getElementById('sync-source-label').textContent = 'Modifiche non salvate su file TXT';
+      document.getElementById('sync-source-label').classList.remove('text-emerald-300');
+      document.getElementById('sync-source-label').classList.add('text-amber-400');
+    }
+
+    // Auto-compilazione dinamica del Passaporto 5.1
+    function autoFillPassport(teamId) {
+      const team = teamsData.find(t => t.id === parseInt(teamId));
+      if (!team) return;
+
+      document.getElementById('pass-team-name').textContent = team.name;
+      document.getElementById('pass-team-meta').textContent = `Classe 3ª A • Stato: ${team.stato}`;
+      
+      document.getElementById('pass-role-1').textContent = `${team.capo} (Capo Investigatore)`;
+      document.getElementById('pass-role-2').textContent = `${team.cartografo} ${team.bes ? '[Studente BES - Cartografo Operativo]' : '(Cartografo)'}`;
+      document.getElementById('pass-role-3').textContent = `${team.tempo} (Custode del Tempo)`;
+      document.getElementById('pass-role-4').textContent = `${team.portavoce} (Portavoce)`;
+
+      document.getElementById('pass-punti-1').textContent = `Pt: ${team.pt1}/100`;
+      document.getElementById('pass-punti-2').textContent = `Pt: ${team.pt2}/100`;
+      document.getElementById('pass-punti-3').textContent = `Pt: ${team.pt3}/100`;
+
+      document.getElementById('pass-badge-1-status').textContent = team.b1 ? '✓ BADGE SBLOCCATO' : 'IN CORSO';
+      document.getElementById('pass-badge-1-status').className = team.b1 ? 'text-emerald-700 font-bold text-xs' : 'text-slate-400 font-bold text-xs';
+
+      document.getElementById('pass-badge-2-status').textContent = team.b2 ? '✓ BADGE SBLOCCATO' : 'IN CORSO';
+      document.getElementById('pass-badge-2-status').className = team.b2 ? 'text-emerald-700 font-bold text-xs' : 'text-slate-400 font-bold text-xs';
+
+      document.getElementById('pass-badge-3-status').textContent = team.b3 ? '✓ BADGE SBLOCCATO' : 'IN CORSO';
+      document.getElementById('pass-badge-3-status').className = team.b3 ? 'text-emerald-700 font-bold text-xs' : 'text-slate-400 font-bold text-xs';
+
+      document.getElementById('pass-punti-tot').textContent = `${team.totale} / 300 pt`;
+      document.getElementById('pass-esito-box').textContent = team.stato;
+      document.getElementById('pass-privilegio').textContent = team.privilegio;
+    }
+
+    // Modalità di Importazione / Esportazione
+    function openSyncModal() {
+      document.getElementById('txt-source-textarea').value = generateExportTxt();
+      document.getElementById('sync-modal').classList.remove('hidden');
+    }
+
+    function closeSyncModal() {
+      document.getElementById('sync-modal').classList.add('hidden');
+    }
+
+    function applyPastedTxt() {
+      const text = document.getElementById('txt-source-textarea').value;
+      const parsed = parseTxtContent(text);
+      if (parsed.length > 0) {
+        teamsData = parsed;
+        renderDashboard();
+        autoFillPassport(document.getElementById('team-selector-quick').value);
+        document.getElementById('sync-source-label').textContent = 'registro_gamification_geo_detectives.txt (Sincronizzato)';
+        document.getElementById('sync-source-label').classList.remove('text-amber-400');
+        document.getElementById('sync-source-label').classList.add('text-emerald-300');
+        closeSyncModal();
+      } else {
+        alert('Formato non riconosciuto: assicurati che sia presente la sezione [CSV_TABELLONE_SINCRONIZZABILE] con le intestazioni corrette.');
+      }
+    }
+
+    function handleFileSelect(evt) {
+      const file = evt.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('txt-source-textarea').value = e.target.result;
+      };
+      reader.readAsText(file);
+    }
+
+    function loadDefaultData() {
+      document.getElementById('txt-source-textarea').value = DEFAULT_TXT_REGISTER;
+    }
+
+    // Generatore del testo completo di registro per l'esportazione bidirezionale
+    function generateExportTxt() {
+      let output = `# ==============================================================================
+# ARCHIVIO CENTRALE DI STATO E SINCRONIZZAZIONE: GEO-DETECTIVES
+# Unità Didattica: Il Pianeta Vivente (Classe 3ª - Secondaria di I Grado)
+# Disciplina: Geografia | Modalità: Gamification Cooperativa
+# Data Aggiornamento Esportazione: ${new Date().toISOString().split('T')[0]}
+# ==============================================================================
+
+[METADATI_SESSIONE]
+classe=Classe 3ª
+sezione=A
+materia=Geografia
+unita=Unità 1 - Il Pianeta Vivente
+totale_squadre=${teamsData.length}
+
+[CSV_TABELLONE_SINCRONIZZABILE]
+ID,Squadra,Capo,Cartografo,Tempo,Portavoce,BES,Pt_D1,Badge_D1,Pt_D2,Badge_D2,Pt_D3,Badge_D3,Punti_Tot,Badge_Tot,Carte_Rimaste,Privilegio,Stato_Finale\n`;
+
+      teamsData.forEach(t => {
+        output += `${t.id},${t.name},${t.capo},${t.cartografo},${t.tempo},${t.portavoce},${t.bes ? 'SI' : 'NO'},${t.pt1},${t.b1 ? 'SI' : 'NO'},${t.pt2},${t.b2 ? 'SI' : 'NO'},${t.pt3},${t.b3 ? 'SI' : 'NO'},${t.totale},${t.badgeTot},${t.carteRimaste},${t.privilegio},${t.stato}\n`;
+      });
+
+      return output;
+    }
+
+    // Esportazione del file TXT aggiornato su disco
+    function exportUpdatedTxt() {
+      const textToSave = generateExportTxt();
+      const blob = new Blob([textToSave], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'registro_gamification_geo_detectives.txt';
+      a.click();
+      
+      document.getElementById('sync-source-label').textContent = 'registro_gamification_geo_detectives.txt (Scaricato e Salvato)';
+      document.getElementById('sync-source-label').classList.remove('text-amber-400');
+      document.getElementById('sync-source-label').classList.add('text-emerald-300');
+    }
+
+    // Timer LIM
+    let timerInterval = null;
+    let secondsLeft = 20 * 60;
+
+    function updateTimerDisplay() {
+      const min = Math.floor(secondsLeft / 60);
+      const sec = secondsLeft % 60;
+      const display = document.getElementById('lim-timer');
+      if (display) {
+        display.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+      }
+    }
+
+    function startTimer(minutes) {
+      clearInterval(timerInterval);
+      secondsLeft = minutes * 60;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        if (secondsLeft > 0) {
+          secondsLeft--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInterval);
+          const display = document.getElementById('lim-timer');
+          if (display) {
+            display.textContent = "TEMPO SCADUTO!";
+            display.classList.add('text-red-500', 'animate-pulse');
+          }
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      secondsLeft = 20 * 60;
+      const display = document.getElementById('lim-timer');
+      if (display) {
+        display.classList.remove('text-red-500', 'animate-pulse');
+      }
+      updateTimerDisplay();
+    }
+
+    // Filtri di visualizzazione
+    function filterView(sectionId) {
+      const allSections = document.querySelectorAll('.content-sec');
+      const allButtons = document.querySelectorAll('.nav-btn');
+
+      allButtons.forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+
+      const activeBtn = document.getElementById(`btn-${sectionId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-blue-600', 'text-white');
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+      }
+
+      if (sectionId === 'all') {
+        allSections.forEach(sec => sec.classList.remove('hidden'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        allSections.forEach(sec => {
+          if (sec.id === sectionId) {
+            sec.classList.remove('hidden');
+            sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            sec.classList.add('hidden');
+          }
+        });
+      }
+    }
+
+    // Inizializzazione automatica
+    window.onload = function() {
+      updateTimerDisplay();
+      teamsData = parseTxtContent(DEFAULT_TXT_REGISTER);
+      renderDashboard();
+      autoFillPassport(4); // Squadra Delta (BES) come selezione predefinita
+    };
+  </script>
+</body>
+</html>
